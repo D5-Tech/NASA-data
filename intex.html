@@ -3,8 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NASA Weather Dashboard</title>
+    <title>Agricultural and Environmental Dashboard</title>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Roboto:wght@300;400&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         body, html {
             margin: 0;
@@ -84,11 +85,9 @@
             margin: 0 0 10px 0;
             color: #7a9cc6;
         }
-        iframe {
-            width: 100%;
-            height: 300px;
-            border: none;
-            border-radius: 10px;
+        canvas {
+            width: 100% !important;
+            height: 300px !important;
         }
         @media (max-width: 768px) {
             .grid {
@@ -99,44 +98,139 @@
 </head>
 <body>
     <div class="dashboard">
-        <h1>NASA Weather Dashboard</h1>
+        <h1>Agricultural and Environmental Dashboard</h1>
         <div class="grid">
             <div class="box value-box">
                 <div class="value-box-content">
-                    <h3>Temperature</h3>
-                    <div id="temperature" class="value">Loading...</div>
+                    <h3>Vegetation Index (NDVI)</h3>
+                    <div id="ndvi" class="value">Loading...</div>
                 </div>
             </div>
             <div class="box value-box">
                 <div class="value-box-content">
-                    <h3>Humidity</h3>
-                    <div id="humidity" class="value">Loading...</div>
+                    <h3>Soil Moisture</h3>
+                    <div id="soil-moisture" class="value">Loading...</div>
                 </div>
             </div>
             <div class="box">
                 <h3>Temperature Trend</h3>
-                <iframe src="https://thingspeak.com/channels/2683832/charts/2?bgcolor=%230a0e17&color=%234dc3ff&dynamic=true&results=60&title=Temperature&type=line&yaxis=Temperature+%C2%B0C&width=auto"></iframe>
+                <canvas id="temperature-chart"></canvas>
             </div>
             <div class="box">
-                <h3>Humidity Trend</h3>
-                <iframe src="https://thingspeak.com/channels/2683832/charts/1?bgcolor=%230a0e17&color=%234dc3ff&dynamic=true&results=60&title=Humidity&type=line&yaxis=Humidity+%25&width=auto"></iframe>
+                <h3>Precipitation</h3>
+                <canvas id="precipitation-chart"></canvas>
+            </div>
+            <div class="box" style="grid-column: 1 / -1;">
+                <h3>Drought Monitor</h3>
+                <div id="drought-monitor">Loading drought monitor data...</div>
             </div>
         </div>
     </div>
 
     <script>
-        function updateValues() {
-            fetch('https://api.thingspeak.com/channels/2683832/feeds/last.json')
-                .then(response => response.json())
-                .then(data => {
-                    document.getElementById('temperature').textContent = data.field2 + ' °C';
-                    document.getElementById('humidity').textContent = data.field1 + ' %';
-                })
-                .catch(error => console.error('Error fetching data:', error));
+        // Simulated NDVI data (replace with real API call)
+        function updateNDVI() {
+            const ndvi = (Math.random() * (0.8 - 0.2) + 0.2).toFixed(2);
+            document.getElementById('ndvi').textContent = ndvi;
         }
 
-        updateValues();
-        setInterval(updateValues, 15000); // Update every 15 seconds
+        // Simulated soil moisture data (replace with real API call)
+        function updateSoilMoisture() {
+            const soilMoisture = (Math.random() * (40 - 10) + 10).toFixed(1);
+            document.getElementById('soil-moisture').textContent = soilMoisture + '%';
+        }
+
+        // Temperature chart
+        const tempCtx = document.getElementById('temperature-chart').getContext('2d');
+        const tempChart = new Chart(tempCtx, {
+            type: 'line',
+            data: {
+                labels: [],
+                datasets: [{
+                    label: 'Temperature (°C)',
+                    data: [],
+                    borderColor: '#4dc3ff',
+                    tension: 0.1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: false
+                    }
+                }
+            }
+        });
+
+        // Precipitation chart
+        const precipCtx = document.getElementById('precipitation-chart').getContext('2d');
+        const precipChart = new Chart(precipCtx, {
+            type: 'bar',
+            data: {
+                labels: [],
+                datasets: [{
+                    label: 'Precipitation (mm)',
+                    data: [],
+                    backgroundColor: '#4dc3ff'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+
+        // Update temperature and precipitation charts
+        function updateCharts() {
+            const now = new Date();
+            const label = now.toLocaleTimeString();
+
+            // Update temperature chart
+            tempChart.data.labels.push(label);
+            tempChart.data.datasets[0].data.push((Math.random() * (30 - 15) + 15).toFixed(1));
+            if (tempChart.data.labels.length > 10) {
+                tempChart.data.labels.shift();
+                tempChart.data.datasets[0].data.shift();
+            }
+            tempChart.update();
+
+            // Update precipitation chart
+            precipChart.data.labels.push(label);
+            precipChart.data.datasets[0].data.push((Math.random() * 10).toFixed(1));
+            if (precipChart.data.labels.length > 10) {
+                precipChart.data.labels.shift();
+                precipChart.data.datasets[0].data.shift();
+            }
+            precipChart.update();
+        }
+
+        // Simulated drought monitor data (replace with real API call)
+        function updateDroughtMonitor() {
+            const droughtLevels = ['None', 'D0 - Abnormally Dry', 'D1 - Moderate Drought', 'D2 - Severe Drought', 'D3 - Extreme Drought', 'D4 - Exceptional Drought'];
+            const randomLevel = droughtLevels[Math.floor(Math.random() * droughtLevels.length)];
+            document.getElementById('drought-monitor').textContent = `Current Drought Level: ${randomLevel}`;
+        }
+
+        // Update all data
+        function updateAllData() {
+            updateNDVI();
+            updateSoilMoisture();
+            updateCharts();
+            updateDroughtMonitor();
+        }
+
+        // Initial update
+        updateAllData();
+
+        // Update every 30 seconds
+        setInterval(updateAllData, 30000);
     </script>
 </body>
 </html>
