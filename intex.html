@@ -95,6 +95,25 @@
             border: 1px solid #cccccc;
             border-radius: 10px;
         }
+        select, button {
+            width: 100%;
+            padding: 10px;
+            margin-top: 10px;
+            background-color: #2a3b5a;
+            color: #e0e0e0;
+            border: none;
+            border-radius: 5px;
+            font-family: 'Roboto', sans-serif;
+        }
+        button {
+            background-color: #4dc3ff;
+            color: #0a0e17;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        button:hover {
+            background-color: #3aa3d9;
+        }
         @media (max-width: 768px) {
             .grid {
                 grid-template-columns: 1fr;
@@ -133,6 +152,22 @@
             <div class="box">
                 <h3>Global Precipitation</h3>
                 <canvas id="precipitation-chart"></canvas>
+            </div>
+            <div class="box">
+                <h3>Weather Prediction</h3>
+                <div id="weather-prediction">Loading weather prediction...</div>
+            </div>
+            <div class="box">
+                <h3>Crop Cultivation System</h3>
+                <select id="crop-select">
+                    <option value="">Select a crop</option>
+                    <option value="wheat">Wheat</option>
+                    <option value="rice">Rice</option>
+                    <option value="corn">Corn</option>
+                    <option value="soybeans">Soybeans</option>
+                </select>
+                <button onclick="analyzeCrop()">Analyze Crop Suitability</button>
+                <div id="crop-analysis"></div>
             </div>
             <div class="box" style="grid-column: 1 / -1;">
                 <h3>Drought Monitor</h3>
@@ -232,12 +267,59 @@
             document.getElementById('drought-monitor').textContent = `Current Drought Level: ${randomLevel}`;
         }
 
+        // Weather prediction system (replace with real API call)
+        function updateWeatherPrediction() {
+            const weatherConditions = ['Sunny', 'Partly Cloudy', 'Overcast', 'Light Rain', 'Heavy Rain'];
+            const randomCondition = weatherConditions[Math.floor(Math.random() * weatherConditions.length)];
+            const temperature = (Math.random() * (35 - 15) + 15).toFixed(1);
+            const humidity = (Math.random() * (90 - 30) + 30).toFixed(1);
+            
+            document.getElementById('weather-prediction').innerHTML = `
+                <p>Forecast: ${randomCondition}</p>
+                <p>Temperature: ${temperature}°C</p>
+                <p>Humidity: ${humidity}%</p>
+            `;
+        }
+
+        // Crop cultivation system
+        function analyzeCrop() {
+            const crop = document.getElementById('crop-select').value;
+            if (!crop) {
+                alert('Please select a crop');
+                return;
+            }
+
+            // In a real-world scenario, this would use actual data and more complex analysis
+            const ndvi = parseFloat(document.getElementById('ndvi').textContent);
+            const soilMoisture = parseFloat(document.getElementById('soil-moisture').textContent);
+            const temperature = parseFloat(tempChart.data.datasets[0].data[tempChart.data.datasets[0].data.length - 1]);
+
+            let analysis = `Analysis for ${crop}:<br>`;
+            analysis += `NDVI: ${ndvi} - `;
+            analysis += ndvi > 0.5 ? 'Good vegetation health<br>' : 'Poor vegetation health<br>';
+            analysis += `Soil Moisture: ${soilMoisture}% - `;
+            analysis += soilMoisture > 20 ? 'Adequate moisture<br>' : 'Insufficient moisture<br>';
+            analysis += `Temperature: ${temperature}°C - `;
+            analysis += (temperature > 20 && temperature < 30) ? 'Optimal temperature range<br>' : 'Suboptimal temperature<br>';
+
+            let suitability = 'Medium';
+            if (ndvi > 0.5 && soilMoisture > 20 && temperature > 20 && temperature < 30) {
+                suitability = 'High';
+            } else if (ndvi < 0.3 || soilMoisture < 10 || temperature < 10 || temperature > 35) {
+                suitability = 'Low';
+            }
+            analysis += `Overall suitability: ${suitability}`;
+
+            document.getElementById('crop-analysis').innerHTML = analysis;
+        }
+
         // Update all data
         function updateAllData() {
             updateNDVI();
             updateSoilMoisture();
             updateCharts();
             updateDroughtMonitor();
+            updateWeatherPrediction();
         }
 
         // Initial update
