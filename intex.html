@@ -4,63 +4,85 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>NASA Weather Dashboard</title>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Roboto:wght@300;400&display=swap" rel="stylesheet">
     <style>
-        body {
-            font-family: 'Roboto', sans-serif;
+        body, html {
             margin: 0;
-            padding: 20px;
-            background: linear-gradient(135deg, #1c2c4c, #11243b);
-            color: #ffffff;
+            padding: 0;
+            font-family: 'Roboto', sans-serif;
+            background-color: #0a0e17;
+            color: #e0e0e0;
             min-height: 100vh;
+            overflow-x: hidden;
         }
         .dashboard {
             max-width: 1200px;
-            margin: 0 auto;
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            border-radius: 20px;
+            margin: 20px auto;
             padding: 20px;
-            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+            background: linear-gradient(45deg, #12192c, #1c2942);
+            border-radius: 15px;
+            box-shadow: 0 0 30px rgba(0, 150, 255, 0.1);
         }
-        .container {
+        h1 {
+            font-family: 'Orbitron', sans-serif;
+            text-align: center;
+            color: #4dc3ff;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+            text-shadow: 0 0 10px rgba(77, 195, 255, 0.5);
+        }
+        .grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
             gap: 20px;
         }
         .box {
             background: rgba(255, 255, 255, 0.05);
-            border-radius: 15px;
-            padding: 15px;
-            text-align: center;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
             transition: all 0.3s ease;
         }
         .box:hover {
             transform: translateY(-5px);
-            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            box-shadow: 0 6px 12px rgba(77, 195, 255, 0.2);
         }
         .value-box {
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        .value-box::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: conic-gradient(
+                from 0deg,
+                transparent 0deg 340deg,
+                rgba(77, 195, 255, 0.2) 340deg 360deg
+            );
+            animation: rotate 4s linear infinite;
+        }
+        .value-box-content {
+            position: relative;
+            z-index: 1;
+        }
+        @keyframes rotate {
+            100% { transform: rotate(360deg); }
         }
         .value {
-            font-size: 28px;
+            font-size: 2.5em;
             font-weight: bold;
-            margin-top: 5px;
-            transition: all 0.5s ease;
-        }
-        h1 {
-            text-align: center;
-            color: #a3c1ff;
-            margin: 0 0 20px 0;
-            font-size: 24px;
+            color: #4dc3ff;
+            margin-top: 10px;
         }
         h3 {
-            margin: 0;
-            font-size: 16px;
-            color: #a3c1ff;
+            font-family: 'Orbitron', sans-serif;
+            margin: 0 0 10px 0;
+            color: #7a9cc6;
         }
         iframe {
             width: 100%;
@@ -68,13 +90,8 @@
             border: none;
             border-radius: 10px;
         }
-        @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.05); }
-            100% { transform: scale(1); }
-        }
         @media (max-width: 768px) {
-            .container {
+            .grid {
                 grid-template-columns: 1fr;
             }
         }
@@ -83,22 +100,26 @@
 <body>
     <div class="dashboard">
         <h1>NASA Weather Dashboard</h1>
-        <div class="container">
+        <div class="grid">
             <div class="box value-box">
-                <h3>Temperature</h3>
-                <div id="temperature" class="value">Loading...</div>
+                <div class="value-box-content">
+                    <h3>Temperature</h3>
+                    <div id="temperature" class="value">Loading...</div>
+                </div>
             </div>
             <div class="box value-box">
-                <h3>Humidity</h3>
-                <div id="humidity" class="value">Loading...</div>
+                <div class="value-box-content">
+                    <h3>Humidity</h3>
+                    <div id="humidity" class="value">Loading...</div>
+                </div>
             </div>
             <div class="box">
-                <h3>Temperature Graph</h3>
-                <iframe src="https://thingspeak.com/channels/2683832/charts/2?bgcolor=%23ffffff&color=%23d62020&dynamic=true&results=60&title=Temperature&type=line&yaxis=Temperature+%C2%B0C"></iframe>
+                <h3>Temperature Trend</h3>
+                <iframe src="https://thingspeak.com/channels/2683832/charts/2?bgcolor=%230a0e17&color=%234dc3ff&dynamic=true&results=60&title=Temperature&type=line&yaxis=Temperature+%C2%B0C&width=auto"></iframe>
             </div>
             <div class="box">
-                <h3>Humidity Graph</h3>
-                <iframe src="https://thingspeak.com/channels/2683832/charts/1?bgcolor=%23ffffff&color=%23d62020&dynamic=true&results=60&title=Humidity&type=line&yaxis=Humidity+%25"></iframe>
+                <h3>Humidity Trend</h3>
+                <iframe src="https://thingspeak.com/channels/2683832/charts/1?bgcolor=%230a0e17&color=%234dc3ff&dynamic=true&results=60&title=Humidity&type=line&yaxis=Humidity+%25&width=auto"></iframe>
             </div>
         </div>
     </div>
@@ -108,19 +129,10 @@
             fetch('https://api.thingspeak.com/channels/2683832/feeds/last.json')
                 .then(response => response.json())
                 .then(data => {
-                    animateValue('temperature', data.field2 + ' °C');
-                    animateValue('humidity', data.field1 + ' %');
+                    document.getElementById('temperature').textContent = data.field2 + ' °C';
+                    document.getElementById('humidity').textContent = data.field1 + ' %';
                 })
                 .catch(error => console.error('Error fetching data:', error));
-        }
-
-        function animateValue(id, newValue) {
-            const element = document.getElementById(id);
-            element.style.animation = 'pulse 0.5s ease-in-out';
-            setTimeout(() => {
-                element.textContent = newValue;
-                element.style.animation = '';
-            }, 250);
         }
 
         updateValues();
